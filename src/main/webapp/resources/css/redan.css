@@ -1,0 +1,67 @@
+.childScrollBar {
+	height: 100%;
+	padding-right: 10000px;
+	box-sizing: content-box;
+	/* So the width will be 100% + 17px */ 
+	overflow: auto;
+}
+.krajee-default.file-preview-frame {
+	margin: 2px;
+}
+.topic-comm{
+	list-style: none;
+	margin: 0;
+	padding:0;
+	border: 0;
+}
+.topic-more-comm{
+	border: 0;
+	color: #3897f0;
+	display: inline;
+	padding: 0;
+	background: 0 0;
+} 
+
+.container {
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: 15px;
+	padding-left: 15px;
+	width: 100%;
+	max-width: 960px; 
+}
+
+@media only screen and (max-width: 600px) {
+	.container {
+		padding-right: 0px;
+		padding-left: 0px;
+	}
+	.card-body {
+		padding: 0.25rem;
+	}
+	.mb-5, .my-5 {
+		margin-bottom: 0rem!important;
+	}
+	.row{}
+	.col-sm-12{
+		padding-right: 0px;
+		padding-left: 0px;
+	}
+	.mobileFooterButton{
+		margin-top: 10px;
+	}
+	.mobileFooterButtonPlus{
+		font-size:x-large;
+	}
+
+} 
+.div-ioc{
+	width: 60px;
+	height: 60px; 
+	border-radius: 50%;
+}
+.ioc{
+	width: 60px;
+	height: 60px; 
+	border-radius: 50%;
+}
