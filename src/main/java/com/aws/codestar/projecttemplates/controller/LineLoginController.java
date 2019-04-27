@@ -58,7 +58,7 @@ public class LineLoginController {
 			  socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 			   ip = socket.getLocalAddress().getHostAddress();
 			}
-		return InetAddress.getLocalHost().getHostAddress() +" is loginFailure<br> your outbound IP is"+ip;
+		return InetAddress.getLocalHost().getHostName() +" is loginFailure<br> your outbound IP is"+ip;
 	}
 
 	@GetMapping("/loginSuccess")

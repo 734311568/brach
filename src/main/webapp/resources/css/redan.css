@@ -31,6 +31,24 @@
 	max-width: 960px; 
 }
 
+.img-personal-headPortrait{
+	margin-right: 10px;
+	width: 50px;
+	height: 50px;
+}
+
+.div-button{
+	display: -ms-flexbox;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-pack: end;
+	justify-content: flex-end;
+	padding: 1rem;
+	border-top: 1px solid #e9ecef;
+	border-bottom-right-radius: .3rem;
+	border-bottom-left-radius: .3rem;
+}
+
 @media only screen and (max-width: 600px) {
 	.container {
 		padding-right: 0px;
@@ -55,13 +73,3 @@
 	}
 
 } 
-.div-ioc{
-	width: 60px;
-	height: 60px; 
-	border-radius: 50%;
-}
-.ioc{
-	width: 60px;
-	height: 60px; 
-	border-radius: 50%;
-}

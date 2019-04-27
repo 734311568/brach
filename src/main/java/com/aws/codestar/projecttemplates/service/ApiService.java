@@ -97,8 +97,10 @@ public class ApiService {
 					//create story/author, story/content---start
 					Element elementOfAuthor = document.createElement("author");
 					elementOfAuthor.setAttribute("id", jSONObjectOfStory.getJSONObject("author").get("id").toString());
-					elementOfAuthor.setAttribute("profileImgUrl", jSONObjectOfStory.getJSONObject("author").get("profileImgUrl").toString());
 					elementOfAuthor.setAttribute("nickname", jSONObjectOfStory.getJSONObject("author").get("nickname").toString());
+					if (!"null".equals(jSONObjectOfStory.getJSONObject("author").get("profileImgUrl").toString())) {
+						elementOfAuthor.setAttribute("profileImgUrl", jSONObjectOfStory.getJSONObject("author").get("profileImgUrl").toString());
+					}
 					elementOfStory.appendChild(elementOfAuthor);
 
 					Element elementOfContent = document.createElement("content");
@@ -183,14 +185,14 @@ public class ApiService {
 		System.out.println(writer.toString());
 		return document;
 	}
-	
+
 	/**
 	 * 获取个人主页数据 personnels/search/findOneById 路径
 	 *
 	 * @param id 参数
 	 * @return
 	 */
-	public Document getPersonnels(String id) throws ParserConfigurationException, IOException {
+	public Document getPersonnels(String id, HttpSession httpSession) throws ParserConfigurationException, IOException {
 
 		//获取文档对象
 		DocumentBuilderFactory newInstance = DocumentBuilderFactory.newInstance();
@@ -213,15 +215,25 @@ public class ApiService {
 			JSONObject object = new JSONObject(string);
 
 			//获取非array的数据
+			//id-唯一标识
+			Element homepageIdElement = doc.createElement("homepageId");
+			homepageIdElement.setAttribute("id", object.get("id").toString());
+			documentElement.appendChild(homepageIdElement);
+
 			//coverImgUrl-背景图
-			Element coverImgUrlElement = doc.createElement("coverImgUrl");
-			coverImgUrlElement.setAttribute("src", object.get("coverImgUrl").toString());
-			documentElement.appendChild(coverImgUrlElement);
+			if (!"null".equals(object.get("coverImgUrl").toString())) {
+				System.out.println("coverImgUrl-背景图--" + object.get("coverImgUrl").toString());
+				Element coverImgUrlElement = doc.createElement("coverImgUrl");
+				coverImgUrlElement.setAttribute("src", object.get("coverImgUrl").toString());
+				documentElement.appendChild(coverImgUrlElement);
+			}
 
 			//profileImgUrl-头像
-			Element profileImgUrlElement = doc.createElement("profileImgUrl");
-			profileImgUrlElement.setAttribute("src", object.get("profileImgUrl").toString());
-			documentElement.appendChild(profileImgUrlElement);
+			if (!"null".equals(object.get("profileImgUrl").toString())) {
+				Element profileImgUrlElement = doc.createElement("profileImgUrl");
+				profileImgUrlElement.setAttribute("src", object.get("profileImgUrl").toString());
+				documentElement.appendChild(profileImgUrlElement);
+			}
 
 			//profileText-简介
 			Element profileTextElement = doc.createElement("profileText");
@@ -243,6 +255,11 @@ public class ApiService {
 			followerCountElement.appendChild(doc.createTextNode(object.get("followerCount").toString()));
 			documentElement.appendChild(followerCountElement);
 
+			//followingCount-跟踪者数量
+			Element followingCountElement = doc.createElement("followingCount");
+			followingCountElement.appendChild(doc.createTextNode(object.get("followingCount").toString()));
+			documentElement.appendChild(followingCountElement);
+
 			//userStory-发表的文章
 			Element userStoryElement = doc.createElement("userStory");
 			documentElement.appendChild(userStoryElement);
@@ -263,9 +280,113 @@ public class ApiService {
 				JSONObject storyImageObject = object2.getJSONObject("storyImage");
 				storyImageElement.setAttribute("imgUrl", storyImageObject.get("imgUrl").toString());
 			}
+
+			if (httpSession.getAttribute("id") != null) {
+				//判断该主页是否属于该用户
+				if (id.equals(httpSession.getAttribute("id").toString())) {
+					//按键置灰
+					Element disabledElement = doc.createElement("disabled");
+					disabledElement.setAttribute("name", "true");
+					documentElement.appendChild(disabledElement);
+
+					//显示好友列表
+					Element friendsListElement = doc.createElement("friendsList");
+					friendsListElement.setAttribute("existence", "");
+					documentElement.appendChild(friendsListElement);
+
+					//查询所有好友
+					String findFriendAll = findFriendAll(httpSession.getAttribute("id").toString());
+					JSONObject friendObject = new JSONObject(findFriendAll);
+
+					//添加好友数量
+					friendsListElement.setAttribute("followerCount", friendObject.get("followerCount").toString());
+
+					//获取好友数据
+					JSONArray followersArray = friendObject.getJSONArray("followers");
+					for (int i = 0; i < followersArray.length(); i++) {
+						Element followersElement = doc.createElement("followers");
+						friendsListElement.appendChild(followersElement);
+						JSONObject followersObject = followersArray.getJSONObject(i);
+
+						//添加状态
+						followersElement.setAttribute("status", followersObject.get("status").toString());
+
+						//添加relatingUser中数据
+						JSONObject relatingUserObject = followersObject.getJSONObject("relatingUser");
+
+						//添加头像
+						if (!"null".equals(relatingUserObject.get("profileImgUrl").toString())) {
+							followersElement.setAttribute("profileImgUrl", relatingUserObject.get("profileImgUrl").toString());
+						}
+
+						//添加id
+						followersElement.setAttribute("id", relatingUserObject.get("id").toString());
+
+						//添加姓名
+						Element relatingUserNicknameElement = doc.createElement("nickname");
+						relatingUserNicknameElement.appendChild(doc.createTextNode(relatingUserObject.get("nickname").toString()));
+						followersElement.appendChild(relatingUserNicknameElement);
+					}
+
+				} else {
+					//判断是否已经添加过该用户
+					JSONArray followersArray = object.getJSONArray("following");
+					for (int i = 0; i < followersArray.length(); i++) {
+						//获取已添加好友id
+						String idString = followersArray.getJSONObject(i).getJSONObject("relatedUser").get("id").toString();
+						if (idString.equals(httpSession.getAttribute("id"))) {
+							//已添加按键置灰
+							Element disabledElement = doc.createElement("disabled");
+							disabledElement.setAttribute("name", "true");
+							documentElement.appendChild(disabledElement);
+						}
+					}
+				}
+			}
+
 		}
 		return doc;
 	}
+
+	/**
+	 * 查询该用户所有好友
+	 *
+	 * @param id
+	 */
+	public String findFriendAll(String id) throws IOException {
+		//生成路径
+		HttpGet httpGet = new AuthHttpClient().bulidHttpGet("personnels/search/findOneById?id=" + id);
+		//获取请求体
+		CloseableHttpResponse execute = HttpClients.createDefault().execute(httpGet);
+		HttpEntity entity = execute.getEntity();
+
+		if (entity != null) {
+			//获取数据
+			String string = EntityUtils.toString(entity, "UTF-8");
+
+			//返回数据
+			JSONObject object = new JSONObject();
+
+			//所有数据
+			JSONObject personalObject = new JSONObject(string);
+
+			//获取所有追随者数据
+			object.put("followers", personalObject.getJSONArray("followers"));
+			System.out.println("追随者:" + personalObject.getJSONArray("followers"));
+
+			//获取追随者数量
+			String followerCount = personalObject.get("followerCount").toString();
+			object.put("followerCount", followerCount);
+			System.out.println("追随者数量:" + followerCount);
+
+			if ("0".equals(followerCount)) {
+				return "登入失败";
+			}
+			return object.toString();
+		}
+		return "登入失败";
+	}
+
 	//	/**
 	//	 * 呼叫 ../storyComment/.. 新增留言
 	//	 *
@@ -289,7 +410,6 @@ public class ApiService {
 	//		HttpEntity Entity = response1.getEntity();
 	//		System.out.println(EntityUtils.toString(Entity));
 	//	}
-
 	/**
 	 * 呼叫 ../stories/" + id + "/storyComment/.. 取得某故事之最新留言
 	 *
@@ -561,128 +681,159 @@ public class ApiService {
 		closeableHttpClient.close();
 		return "上傳成功";
 	}
-		/**
-	 * 访问个人主页
-	 *
-	 * @param id
-	 * @return
-	 * @throws TransformerConfigurationException
-	 * @throws TransformerException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
+
+	/*
+	发送好友请求
+	
+		{
+			"relatedUser":"https://redan-api.herokuapp.com/personnels/3"
+			"relatingUser":"https://redan-api.herokuapp.com/personnels/1"
+			"status":0
+		 }
 	 */
-	public Document getHomepage(Integer id) throws TransformerConfigurationException, TransformerException, IOException, ParserConfigurationException {
-		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-		Element documentElement = doc.createElement("document");
-		doc.appendChild(documentElement);
-		CloseableHttpResponse response1 = HttpClients.createDefault().execute(new HttpGet("https://redan-api.herokuapp.com/personnels/search/findOneById?id=" + id));
-		HttpEntity entity = response1.getEntity();
-		try {
-			if (null != entity) {
-				String getDataStr = EntityUtils.toString(entity, "UTF-8");
-				JSONObject jsonObjectDataStr = new JSONObject(getDataStr);
+	public void postFriend(String relatedId, String relatingId) throws IOException {
+		JSONObject jSONFriend = new JSONObject();
 
-				//创建nickname
-				Element nicknameElement = doc.createElement("nickname");
-				String nicknameString = jsonObjectDataStr.get("nickname").toString();
-				nicknameElement.appendChild(doc.createTextNode(nicknameString));
-				documentElement.appendChild(nicknameElement);
+		//获取请求发送者者
+		jSONFriend.put("relatedUser", "https://redan-api.herokuapp.com/personnels/" + relatedId);
 
-				//创建followingCount
-				Element followingCountElement = doc.createElement("followingCount");
-				String followingCountString = jsonObjectDataStr.get("followingCount").toString();
-				followingCountElement.appendChild(doc.createTextNode(followingCountString));
-				documentElement.appendChild(followingCountElement);
+		//获取被请求者
+		jSONFriend.put("relatingUser", "https://redan-api.herokuapp.com/personnels/" + relatingId);
 
-				//创建followerCount
-				Element followerCountElement = doc.createElement("followerCount");
-				String followerCountString = jsonObjectDataStr.get("followerCount").toString();
-				followerCountElement.appendChild(doc.createTextNode(followerCountString));
-				documentElement.appendChild(followerCountElement);
+		//状态
+		jSONFriend.put("status", "0");
 
-				//创建userStoryCount
-				Element userStoryCountElement = doc.createElement("userStoryCount");
-				String userStoryCountString = jsonObjectDataStr.get("userStoryCount").toString();
-				userStoryCountElement.appendChild(doc.createTextNode(userStoryCountString));
-				documentElement.appendChild(userStoryCountElement);
+		//创建连接
+		HttpPost httpPost = new AuthHttpClient().bulidHttpPost("userRelationships");
 
-				//创建coverImgUrl
-				Element coverImgUrlElement = doc.createElement("coverImgUrl");
-				String coverImgUrlString = jsonObjectDataStr.get("coverImgUrl").toString();
-				coverImgUrlElement.setAttribute("cover", coverImgUrlString);
-				documentElement.appendChild(coverImgUrlElement);
+		//添加请求头
+		httpPost.setHeader("Content-type", "application/hal+json;charset=UTF-8");
 
-				//创建profileImgUrl
-				Element profileImgUrlElement = doc.createElement("profileImgUrl");
-				String profileImgUrlString = jsonObjectDataStr.get("profileImgUrl").toString();
-				profileImgUrlElement.setAttribute("cover", profileImgUrlString);
-				documentElement.appendChild(profileImgUrlElement);
+		//封装数据
+		StringEntity stringEntityGoodFriend = new StringEntity(jSONFriend.toString(), "UTF-8");
 
-				//创建profileText
-				Element profileTextElement = doc.createElement("profileText");
-				profileTextElement.appendChild(doc.createTextNode(jsonObjectDataStr.get("profileText").toString()));
-				documentElement.appendChild(profileTextElement);
+		//添加请求体
+		httpPost.setEntity(stringEntityGoodFriend);
 
-				//创建cuserStory  第一层
-				JSONArray jsonArrayUserStorys = jsonObjectDataStr.getJSONArray("userStory");
+		//发送请求
+		CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
+		CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpPost);
 
-				Element userStoryElement = doc.createElement("userStorys");
+		//查看结果
+		String storyUrl = new JSONObject(EntityUtils.toString(closeableHttpResponse.getEntity())).toString();
+		System.out.println("添加成功---------------" + storyUrl);
 
-				for (int i = 0; i < jsonArrayUserStorys.length(); i++) {
-					Element userElement = doc.createElement("userStory");
-					JSONObject jsonObjectUserStory = jsonArrayUserStorys.getJSONObject(i);
-					System.out.println("jsonObjectUserStory\t" + jsonObjectUserStory);
+		closeableHttpResponse.close();
+		closeableHttpClient.close();
 
-					//创建storyImage  第二层
-					JSONObject jsonObjectStoryImage = jsonObjectUserStory.getJSONObject("storyImage");
-					Element storyImageElement = doc.createElement("storyImage");
-					userElement.appendChild(storyImageElement);
-
-					//创建 imgUrl 第三层
-					String imgUrlString = jsonObjectStoryImage.get("imgUrl").toString();
-					Element imgUrlElement = doc.createElement("imgUrl");
-					imgUrlElement.setAttribute("att", imgUrlString);
-					storyImageElement.appendChild(imgUrlElement);
-
-					userElement.appendChild(storyImageElement);
-					userStoryElement.appendChild(userElement);
-				}
-				documentElement.appendChild(userStoryElement);
-
-			}
-		} finally {
-			response1.close();
-		}
-
-		DOMSource domSource = new DOMSource(doc);
-		StringWriter writer = new StringWriter();
-		StreamResult result = new StreamResult(writer);
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer transformer = tf.newTransformer();
-		transformer.transform(domSource, result);
-		System.out.println(writer.toString());
-		return doc;
 	}
 
 	/**
-	 * 返回根据评论者id找头像
+	 * 会员数据
 	 *
 	 * @param id
-	 * @return
-	 * @throws java.io.IOException
+	 * @throws ParserConfigurationException
+	 * @throws IOException
 	 */
-	public String getImg(Integer id) throws IOException {
-		String str = null;
-		CloseableHttpResponse response1 = HttpClients.createDefault().execute(new HttpGet("https://redan-api.herokuapp.com/personnels/search/findOneById?id=" + id));
-		HttpEntity entity = response1.getEntity();
-		if (null != entity) {
-			String getDataStr = EntityUtils.toString(entity, "UTF-8");
-			System.out.println("getDataStr\t" + getDataStr);
-			JSONObject jsonObjectDataStr = new JSONObject(getDataStr);
-			String profileImgUrlValue = jsonObjectDataStr.get("profileImgUrl").toString();
-			str = profileImgUrlValue;
+	public Document memberCenterXml(String id) throws ParserConfigurationException, IOException {
+		//创建文档对象
+		DocumentBuilderFactory newInstance = DocumentBuilderFactory.newInstance();
+		DocumentBuilder newDocumentBuilder = newInstance.newDocumentBuilder();
+		Document doc = newDocumentBuilder.newDocument();
+
+		//生成根元素
+		Element documentElement = doc.createElement("document");
+		doc.appendChild(documentElement);
+
+		//创建连接
+		HttpGet httpGet = new AuthHttpClient().bulidHttpGet("personnels/" + id);
+
+		//获取请求体
+		CloseableHttpResponse execute = HttpClients.createDefault().execute(httpGet);
+		HttpEntity entity = execute.getEntity();
+
+		if (entity != null) {
+			String string = EntityUtils.toString(entity, "UTF-8");
+
+			JSONObject jsonObject = new JSONObject(string);
+
+			//universallyUniqueIdentifier-唯一标识符
+			Element universallyUniqueIdentifierElement = doc.createElement("universallyUniqueIdentifier");
+			universallyUniqueIdentifierElement.appendChild(doc.createTextNode(jsonObject.get("universallyUniqueIdentifier").toString()));
+			documentElement.appendChild(universallyUniqueIdentifierElement);
+
+			//nickname-名字
+			Element nicknameElement = doc.createElement("nickname");
+			nicknameElement.appendChild(doc.createTextNode(jsonObject.get("nickname").toString()));
+			documentElement.appendChild(nicknameElement);
+
+			//facebookId-脸谱网id
+			Element facebookIdElement = doc.createElement("facebookId");
+			facebookIdElement.appendChild(doc.createTextNode(jsonObject.get("facebookId").toString()));
+			documentElement.appendChild(facebookIdElement);
+
+			//googleId-谷歌id
+			Element googleIdElement = doc.createElement("googleId");
+			googleIdElement.appendChild(doc.createTextNode(jsonObject.get("googleId").toString()));
+			documentElement.appendChild(googleIdElement);
+
+			//lineId-
+			Element lineIdElement = doc.createElement("lineId");
+			lineIdElement.appendChild(doc.createTextNode(jsonObject.get("lineId").toString()));
+			documentElement.appendChild(lineIdElement);
+
+			//email-邮箱/账号
+			Element emailElement = doc.createElement("email");
+			emailElement.appendChild(doc.createTextNode(jsonObject.get("email").toString()));
+			documentElement.appendChild(emailElement);
+
+			//lastname-姓
+			Element lastnameElement = doc.createElement("lastname");
+			lastnameElement.appendChild(doc.createTextNode(jsonObject.get("lastname").toString()));
+			documentElement.appendChild(lastnameElement);
+
+			//firstname-初始名称
+			Element firstnameElement = doc.createElement("firstname");
+			firstnameElement.appendChild(doc.createTextNode(jsonObject.get("firstname").toString()));
+			documentElement.appendChild(firstnameElement);
+
+			//birth-生日
+			Element birthElement = doc.createElement("birth");
+			birthElement.appendChild(doc.createTextNode(jsonObject.get("birth").toString()));
+			documentElement.appendChild(birthElement);
+
+			//gender-性别
+			Element genderElement = doc.createElement("gender");
+			genderElement.appendChild(doc.createTextNode(jsonObject.get("gender").toString()));
+			documentElement.appendChild(genderElement);
+
+			//storeName-商铺名称
+			Element storeNameElement = doc.createElement("storeName");
+			storeNameElement.appendChild(doc.createTextNode(jsonObject.get("storeName").toString()));
+			documentElement.appendChild(storeNameElement);
+
+			//openedAt-账号成立时间
+			Element openedAtElement = doc.createElement("openedAt");
+			openedAtElement.appendChild(doc.createTextNode(jsonObject.get("openedAt").toString()));
+			documentElement.appendChild(openedAtElement);
+
+			//coverImgUrl-主页背景图
+			Element coverImgUrlElement = doc.createElement("coverImgUrl");
+			coverImgUrlElement.appendChild(doc.createTextNode(jsonObject.get("coverImgUrl").toString()));
+			documentElement.appendChild(coverImgUrlElement);
+
+			//profileImgUrl-头像
+			Element profileImgUrlElement = doc.createElement("profileImgUrl");
+			profileImgUrlElement.appendChild(doc.createTextNode(jsonObject.get("profileImgUrl").toString()));
+			documentElement.appendChild(profileImgUrlElement);
+
+			//profileText-个人简介
+			Element profileTextElement = doc.createElement("profileText");
+			profileTextElement.appendChild(doc.createTextNode(jsonObject.get("profileText").toString()));
+			documentElement.appendChild(profileTextElement);
+
+			return doc;
 		}
-		System.out.println("APIservice \t" + str);
-		return str;
+		return null;
 	}
 }

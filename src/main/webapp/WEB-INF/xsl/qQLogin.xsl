@@ -18,25 +18,23 @@
 				<META charset="utf-8"/>
 				<META http-equiv="X-UA-Compatible" content="IE=edge"/>
 				<META name="viewport" content="width=device-width, initial-scale=1"/>
-				<TITLE>會員登入</TITLE>
+				<TITLE>QQ登入</TITLE>
 				<LINK rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
 				<LINK rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"/>
 				<SCRIPT src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></SCRIPT>
 				<SCRIPT src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></SCRIPT>
-				<!-- oAuth2 LogIn -->
-				<SCRIPT src="/resources/js/oAuth2LogIn.js"></SCRIPT>
-				<SCRIPT src="/resources/js/qq.js"></SCRIPT>
 				<!-- Facebook Login -->
-				<!--<SCRIPT src="/resources/js/fbLogIn.js"></SCRIPT>-->
-				<!-- Google Sign-In -->
-				<!--				<META name="google-signin-scope" content="profile email"/>
+				<SCRIPT src="/resources/js/fbLogIn.js"></SCRIPT>
+				<!-- Google Sign-In-->
+				<META name="google-signin-scope" content="profile email"/>
 				<META name="google-signin-client_id" content="386872756196-ct0oldlv5utvq3oi0lulegsgubrkjkn8.apps.googleusercontent.com"/>
 				<SCRIPT src="https://apis.google.com/js/platform.js?onload=init"></SCRIPT>
-				<SCRIPT src="/resources/js/googleSignIn.js"></SCRIPT>-->
+				<SCRIPT src="/resources/js/googleSignIn.js"></SCRIPT>
 				<!-- Line Login -->
-				<!--<SCRIPT src="/resources/js/lineLogIn.js"></SCRIPT>-->
+				<SCRIPT src="/resources/js/lineLogIn.js"></SCRIPT>
 				<!-- BBMall Login -->
-				<!-- 				<SCRIPT src="/resources/js/originLogIn.js"></SCRIPT> -->
+				<SCRIPT src="/resources/js/originLogIn.js"></SCRIPT>
+				<SCRIPT src="/resources/js/qq.js"></SCRIPT>
 				<STYLE type="text/css">
 					.login-form {
 					width: 340px;
@@ -110,33 +108,15 @@
 			</HEAD>
 			<BODY>
 				<DIV class="login-form">
-					<FORM action="/originLogin" method="POST">
+					<FORM action="/qq/login" method="POST">
 						<DIV class="text-center social-btn">
-							<H2 class="text-center">會員登入</H2>
-							<DIV class="text-center social-btn">
-								<A class="btn btn-primary btn-block login" name="facebook">
-									<I class="fab fa-facebook"></I> 以 <B>Facebook</B> 登入
-								</A>
-								<A class="btn btn-danger btn-block login" name="google" id="google">
-									<I class="fab fa-google"></I> 以 <B>Google</B> 登入
-								</A>
-								<A class="btn btn-success btn-block login" name="line">
-									<I class="fab fa-line"></I> 以 <B>Line</B> 登入
-								</A>
-								<A class="btn btn-success btn-block" name="qq" onclick="toLogin()">
-									<I class="fab fa-line"></I> 以 <B>QQ</B> 登入
-								</A>
-							</DIV>
-							<DIV class="or-seperator">
-								<I>或以 BBMall 帳號登入</I>
-							</DIV>
+							<H2 class="text-center">QQ登入</H2>
 							<DIV class="form-group">
 								<DIV class="input-group">
 									<SPAN class="input-group-addon">
 										<I class="fa fa-user"></I>
 									</SPAN>
-									<!-- 									<INPUT type="text" class="form-control" name="userEmail" placeholder="帳號(信箱)" required=""/> -->
-									<INPUT type="text" class="form-control" name="username" placeholder="帳號(信箱)" required=""/>
+									<INPUT type="text" class="form-control" name="userEmail" placeholder="帳號" required=""/>
 								</DIV>
 							</DIV>
 							<DIV class="form-group">
@@ -157,7 +137,6 @@
 							</DIV>
 						</DIV>
 					</FORM>
-					<DIV class="hint-text small">還不是會員嗎？ <A href="/registerview/" class="text-success">立即註冊！</A></DIV>
 				</DIV>
 			</BODY>
 		</HTML>

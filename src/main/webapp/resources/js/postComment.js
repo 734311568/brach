@@ -4,7 +4,7 @@ $(document).ready(function () {
 		e.preventDefault();
 		var storyId = $(this).children().children('INPUT[name="storyId"]').val();
 		$.post($(this).attr('action'), $(this).serialize(), function (data) {
-			if (data === null || data === "")
+			if (data === null || data === "You don't have required role to perform this action.")
 			{
 				alert("請登入帳號以繼續...");
 				window.location.href = "/login";
@@ -24,12 +24,12 @@ $(document).ready(function () {
 
 			$.each($.parseJSON(data), function (idx, obj) {
 				var ulElement = document.createElement('UL'), liElement = document.createElement('LI'), divElement = document.createElement('DIV'),
-					aElement = document.createElement('A'), spanElement = document.createElement('SPAN'), imgElement = document.createElement('img');
+					aElement = document.createElement('A'), spanElement = document.createElement('SPAN');
 				$(liElement).append($(divElement).attr({'class': 'd-inline'}).append($(aElement).attr({
 					'class': 'text-left text-dark',
 					'title': obj.who,
-					'href':  '/Personalpage?id=' + obj.whoId
-				}).text(obj.who + ' ')).prepend($(imgElement).attr({'class': 'ioc', 'src': obj.img})));
+					'href': obj.who
+				}).text(obj.who + ' ')));
 				$(liElement).append($(spanElement).attr({'class': 'd-inline'}).text(obj.content));
 
 				$(mydivElement).append($(ulElement).attr({

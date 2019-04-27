@@ -17,7 +17,7 @@ $(document).ready(function () {
 				myImgUrls.urls.push({"url": item});
 			}
 		}
-		
+
 		var jsonString = JSON.stringify(myImgUrls);
 
 		var storydata = {
@@ -27,7 +27,7 @@ $(document).ready(function () {
 			imgUrls: jsonString};
 
 		$.post('/postStory', storydata, function (data) {
-			if (data === null || data === "")
+			if (data === null || data === "You don't have required role to perform this action.")
 			{
 				alert("請登入帳號以繼續...");
 				window.location.href = "/login";

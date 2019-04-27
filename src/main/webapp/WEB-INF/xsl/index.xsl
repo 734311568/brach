@@ -20,10 +20,7 @@
 			<SCRIPT src="/resources/js/likeAndBookSubmit.js"></SCRIPT>
 			<SCRIPT src="/resources/js/postStory.js"></SCRIPT>
 			<SCRIPT src="/resources/js/postComment.js"></SCRIPT>
-			<SCRIPT src="/resources/js/memberCenter.js"></SCRIPT>
-			<SCRIPT src="/resources/js/personalHomepage.js"></SCRIPT>
-			<SCRIPT src="/resources/js/share.js"></SCRIPT>
-			<SCRIPT src="/resources/js/bookmark.js"></SCRIPT>
+			<!--<SCRIPT src="/resources/js/memberCenter.js"></SCRIPT>-->
 			<!-- End 社群相關功能 -->
 		</HTML>
 	</xsl:template>
@@ -72,12 +69,11 @@
 			<SCRIPT src="/resources/emoji/js/emoji-picker.js"></SCRIPT>
 			<SCRIPT src="/resources/js/aws-sdk-2.283.1.min.js"></SCRIPT>
 			<SCRIPT src="/resources/js/s3init.js"></SCRIPT>
+			<SCRIPT src="/resources/js/friend.js"></SCRIPT>
 			<!-- End emoji-picker JavaScript -->
-			<!--clipboard复制插件-->
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
 			<TITLE>Hello, 這裡是BBMall!</TITLE>
 		</HEAD>
-		<BODY>
+		<BODY name="{@me}">
 			<HEADER>
 				<NAV class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
 					<DIV class="d-xl-none">
@@ -106,7 +102,9 @@
 						</UL>
 						<DIV>
 							<xsl:if test="@me">
-								<BUTTON name="memberCenter" class="btn btn-dark">會員中心</BUTTON>
+								<a href="/memberCenter">
+									<BUTTON name="memberCenter" class="btn btn-dark" href="/memberCenter">會員中心</BUTTON>
+								</a>
 							</xsl:if>
 						</DIV>
 						<!-- 登入 -->
@@ -205,7 +203,7 @@
 									<DIV id="kartik-file-errors"></DIV>
 								</DIV>
 
-								<!-- tag friend dashboad -->
+								<!--tag friend dashboad--> 
 								<DIV class="modal fade" id="tagFriend" tabindex="-1" role="dialog" aria-labelledby="tagFriendLabel" aria-hidden="true">
 									<DIV class="modal-dialog modal-lg" role="document">
 										<DIV class="modal-content">
@@ -225,119 +223,29 @@
 														<UL class="dropdown-menu dropdown-menu-right" role="menu" style=" max-height: 375px; overflow: auto; display: block;">
 															<TABLE class="table table-condensed table-sm" style="margin:0">
 																<THEAD>
-																	<TR>
-																		<TH>UserName(31)</TH>
+																	<TR id="followerCount">
+																			
 																	</TR>
 																</THEAD>
-																<TBODY>
-																	<TR Data-index="0" data-id="20001" data-key="淳芸">
-																		<TD Data-name="userName">淳芸</TD>
-																	</TR>
-																	<TR Data-index="1" data-id="20000" data-key="orion-01">
-																		<TD Data-name="userName">orion-01</TD>
-																	</TR>
-																	<TR Data-index="2" data-id="20011" data-key="唐宏禹14">
-																		<TD Data-name="userName">唐宏禹14</TD>
-																	</TR>
-																	<TR Data-index="3" data-id="20011" data-key="唐宏禹13">
-																		<TD Data-name="userName">唐宏禹13</TD>
-																	</TR>
-																	<TR Data-index="4" data-id="20002" data-key="穆晓晨">
-																		<TD Data-name="userName">穆晓晨</TD>
-																	</TR>
-																	<TR Data-index="5" data-id="20003" data-key="张欢引">
-																		<TD Data-name="userName">张欢引</TD>
-																	</TR>
-																	<TR Data-index="6" data-id="20004" data-key="吴琼">
-																		<TD Data-name="userName">吴琼</TD>
-																	</TR>
-																	<TR Data-index="7" data-id="20005" data-key="吴东鹏">
-																		<TD Data-name="userName">吴东鹏</TD>
-																	</TR>
-																	<TR Data-index="8" data-id="20006" data-key="黄少铅">
-																		<TD Data-name="userName">黄少铅</TD>
-																	</TR>
-																	<TR Data-index="9" data-id="20007" data-key="胡运燕">
-																		<TD Data-name="userName">胡运燕</TD>
-																	</TR>
-																	<TR Data-index="10" data-id="20008" data-key="刘幸">
-																		<TD Data-name="userName">刘幸</TD>
-																	</TR>
-																	<TR Data-index="11" data-id="20009" data-key="陈媛媛">
-																		<TD Data-name="userName">陈媛媛</TD>
-																	</TR>
-																	<TR Data-index="12" data-id="20010" data-key="李大鹏">
-																		<TD Data-name="userName">李大鹏</TD>
-																	</TR>
-																	<TR Data-index="13" data-id="20011" data-key="唐宏禹">
-																		<TD Data-name="userName">唐宏禹</TD>
-																	</TR>
-																	<TR Data-index="14" data-id="20010" data-key="旷东林">
-																		<TD Data-name="userName">旷东林</TD>
-																	</TR>
-																	<TR Data-index="15" data-id="20011" data-key="唐宏禹15">
-																		<TD Data-name="userName">唐宏禹15</TD>
-																	</TR>
-																	<TR Data-index="16" data-id="20011" data-key="唐宏禹12">
-																		<TD Data-name="userName">唐宏禹12</TD>
-																	</TR>
-																	<TR Data-index="17" data-id="20011" data-key="唐宏禹11">
-																		<TD Data-name="userName">唐宏禹11</TD>
-																	</TR>
-																	<TR Data-index="18" data-id="20010" data-key="旷东林">
-																		<TD Data-name="userName">旷东林</TD>
-																	</TR>
-																	<TR Data-index="19" data-id="20011" data-key="唐宏禹10">
-																		<TD Data-name="userName">唐宏禹10</TD>
-																	</TR>
-																	<TR Data-index="20" data-id="20011" data-key="唐宏禹">
-																		<TD Data-name="userName">唐宏禹</TD>
-																	</TR>
-																	<TR Data-index="21" data-id="20011" data-key="唐宏禹9">
-																		<TD Data-name="userName">唐宏禹9</TD>
-																	</TR>
-																	<TR Data-index="22" data-id="20011" data-key="唐宏禹8">
-																		<TD Data-name="userName">唐宏禹8</TD>
-																	</TR>
-																	<TR Data-index="23" data-id="20011" data-key="唐宏禹7">
-																		<TD Data-name="userName">唐宏禹7</TD>
-																	</TR>
-																	<TR Data-index="24" data-id="20010" data-key="旷东林">
-																		<TD Data-name="userName">旷东林</TD>
-																	</TR>
-																	<TR Data-index="25" data-id="20011" data-key="唐宏禹6">
-																		<TD Data-name="userName">唐宏禹6</TD>
-																	</TR>
-																	<TR Data-index="26" data-id="20011" data-key="唐宏禹5">
-																		<TD Data-name="userName">唐宏禹5</TD>
-																	</TR>
-																	<TR Data-index="27" data-id="20011" data-key="唐宏禹4">
-																		<TD Data-name="userName">唐宏禹4</TD>
-																	</TR>
-																	<TR Data-index="28" data-id="20011" data-key="唐宏禹3">
-																		<TD Data-name="userName">唐宏禹3</TD>
-																	</TR>
-																	<TR Data-index="29" data-id="20011" data-key="唐宏禹2">
-																		<TD Data-name="userName">唐宏禹2</TD>
-																	</TR>
-																	<TR Data-index="30" data-id="20011" data-key="唐宏禹1">
-																		<TD Data-name="userName">唐宏禹1</TD>
-																	</TR>
+																<TBODY id="followers">
+																		
+																		
 																</TBODY>
 															</TABLE>
 														</UL>
 													</DIV>
-													<!-- /btn-group -->
+													<!--/btn-group--> 
 												</DIV>
 											</DIV>
-											<DIV class="modal-footer">
+											<DIV class="div-button">
+												<BUTTON type="button" class="btn btn-secondary" data-dismiss="modal" onclick="addInputBox()">确定</BUTTON>
 												<BUTTON type="button" class="btn btn-secondary" data-dismiss="modal">Close</BUTTON>
 											</DIV>
 										</DIV>
 									</DIV>
-								</DIV>   <!-- TAG FRIEND DASHBOAD END -->
-								<!-- file upload dashboad -->
-								
+								</DIV>    <!--TAG FRIEND DASHBOAD END--> 
+								<!--file upload dashboad--> 
+							
 							</DIV>
 							<!-- story -->
 							<xsl:apply-templates select="stories"/>
@@ -401,9 +309,15 @@
 					<!-- story-title -->
 					<DIV class="p-2 mb-5">
 						<BUTTON type="button" class="float-left btn btn-outline-light">
-							<A title="theofficialai3" class="text-dark" href="/theofficialai3/">
-								<!-- img ioc -->
-								<img class="div-ioc" src="{author/@profileImgUrl}"/>
+							<A title="homepage" class="text-dark" onclick="getHomepage({author/@id})">
+								<xsl:choose>
+									<xsl:when test="author/@profileImgUrl">
+										<img src="{author/@profileImgUrl}" class="rounded-circle img-personal-headPortrait"/>
+									</xsl:when>
+									<xsl:otherwise>
+										<img src="resources/1.jpg" class="rounded-circle img-personal-headPortrait"/>
+									</xsl:otherwise>
+								</xsl:choose>
 								<xsl:value-of select="author/@nickname"/>
 							</A>
 						</BUTTON>
@@ -428,14 +342,11 @@
 					<DIV class="carousel-inner">
 						<xsl:apply-templates select="storyImages"/>
 					</DIV>
-					<A CLass="carousel-control-prev"
-					   href="/Personalpage" role="button" data-slide="prev">
-						<!-- 					   	<IMG src="{author/@profilImg}" class="rounded-circle"/> -->
+					<A CLass="carousel-control-prev" href="#{generate-id(@id)}" role="button" data-slide="prev">
 						<SPAN class="carousel-control-prev-icon" aria-hidden="true"></SPAN>
 						<SPAN class="sr-only">Previous</SPAN>
 					</A>
-					<A CLass="carousel-control-next"
-					   href="#carouselExampleIndicators" role="button" data-slide="next">
+					<A CLass="carousel-control-next" href="#{generate-id(@id)}" role="button" data-slide="next">
 						<SPAN class="carousel-control-next-icon" aria-hidden="true"></SPAN>
 						<SPAN class="sr-only">Next</SPAN>
 					</A>
@@ -447,32 +358,9 @@
 				</P>
 				<DIV>
 					<DIV class="d-flex justify-content-between align-items-center">
-						<!--分享的模态框-->
-						<div class="modal" id="mymodal">
-							<div class="modal-dialog">
-								
-								<div class="modal-content">
-									<div class="modal-header">
-										分享
-										<a  class="close"   data-dismiss="modal" aria-hidden="true"  onclick="myclike(this.value)">
-										&#215; 
-										</a>
-									</div>
-									
-									<div class="modal-body">
-										<I CLass="fas  fa-share-alt" />
-										<input id="foo" value="http://localhost:8080/"/>
-										
-									</div>
-									<div class="modal-footer">
-										<a href="#" class="btn" data-clipboard-target="#foo" data-clipboard-action="copy"  data-dismiss="modal" >复制</a>	
-									</div>
-								</div>
-							</div>
-						</div>
 						<DIV class="btn-group">
 							<FORM>
-								<BUTTON type="button" class="btn btn-lg btn-light"  value="copy"  onclick="myclike(this.value)">
+								<BUTTON type="button" class="btn btn-lg btn-light">
 									<I CLass="fas fa-share-alt"/>
 								</BUTTON>
 							</FORM>
@@ -552,10 +440,8 @@
 		<UL class="topic-comm" style="clear:both">
 			<LI>
 				<DIV class="d-inline">
-					<!--这里植入评论者头像-->
-					<A class="text-left text-dark ioc"  whoid="{who/@id}"  title="{who/@nickname}"  href="/Personalpage?id={who/@id}">
-						<img  class="ioc"  imgvalueid="{who/@id}"   src="" />
-						<xsl:value-of select="who/@nickname"/>
+					<A CLass="text-left text-dark" title="{who/@nickname}" href="{who/@nickname}">
+						<xsl:value-of select="who/@nickname"/> 
 					</A>
 				</DIV>
 				<SPAN class="d-inline">

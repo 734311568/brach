@@ -7,7 +7,7 @@ $(document).ready(function () {
 
 		$.post(elementForm.attr('action'), elementForm.serialize(), function (data) {
 			console.log("return: " + data);
-			if (data === null || data === "")
+			if (data === null || data === "You don't have required role to perform this action.")
 			{
 				alert("請登入帳號以繼續...");
 				window.location.href = "/login";

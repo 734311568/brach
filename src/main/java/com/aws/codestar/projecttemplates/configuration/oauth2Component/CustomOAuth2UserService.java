@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.aws.codestar.projecttemplates.configuration.oauth2Component.user.OAuth2UserInfo;
 import com.aws.codestar.projecttemplates.configuration.oauth2Component.user.OAuth2UserInfoFactory;
 import com.aws.codestar.projecttemplates.exception.OAuth2AuthenticationProcessingException;
 import com.aws.codestar.projecttemplates.model.User;
@@ -41,21 +42,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+        	
+                OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
 
-        	System.out.println("processOAuth2User");
-        	System.out.println(oAuth2UserRequest.getClientRegistration().getRegistrationId());
-        	System.out.println(oAuth2User.getAttributes());
-                com.aws.codestar.projecttemplates.configuration.oauth2Component.user.OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
-//                if (StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
-//                        throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
-//                }
                 String clientName = null;
                 JSONObject userOptional = null;
                 User user = new User();
                 try {
-
-                        clientName = oAuth2UserRequest.getClientRegistration().getClientName();
-                        System.out.println("oAuth2UserRequest");
+                        clientName = oAuth2UserRequest.getClientRegistration().getClientName();                        
                         if ("Facebook".equalsIgnoreCase(clientName)) {
                                 userOptional = apiService.findOneByThirdPartyId("facebook", oAuth2UserInfo.getId());
                                 System.out.println("login with facebook");
@@ -68,7 +62,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         }else {
                                 System.out.print("unknaow client");
                         }
-                        System.out.println("1");
                 } catch (URISyntaxException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -76,16 +69,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                 }
-                System.out.println("2");
+                
                 String uuid = userOptional.getString("universallyUniqueIdentifier");
                 String personnelId = userOptional.get("id").toString();
                 String personnelHref = userOptional.getJSONObject("_links").getJSONObject("self").getString("href");
-                
-//      user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-                
-                
-                
-                
+            
                 user.setProviderId(oAuth2UserInfo.getId());
                 user.setName(oAuth2UserInfo.getName());
 				if(oAuth2UserInfo.getEmail()==null) {
@@ -102,20 +90,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 //    	return null;
         }
 
-//    private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
-//        User user = new User();
-//
-//        user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-//        user.setProviderId(oAuth2UserInfo.getId());
-//        user.setName(oAuth2UserInfo.getName());
-//        user.setEmail(oAuth2UserInfo.getEmail());
-//        user.setImageUrl(oAuth2UserInfo.getImageUrl());
-//        return userRepository.save(user);
-//    }
-//
-//    private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
-//        existingUser.setName(oAuth2UserInfo.getName());
-//        existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
-//        return userRepository.save(existingUser);
-//    }
+    private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
+        User user = new User();
+        user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
+        user.setProviderId(oAuth2UserInfo.getId());
+        user.setName(oAuth2UserInfo.getName());
+        user.setEmail(oAuth2UserInfo.getEmail());
+        user.setImageUrl(oAuth2UserInfo.getImageUrl());
+        
+        
+        return null;
+    }
+
+    private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
+        existingUser.setName(oAuth2UserInfo.getName());
+        existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
+        return null;
+    }
 }
